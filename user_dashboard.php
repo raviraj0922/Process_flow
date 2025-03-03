@@ -84,7 +84,7 @@ $conn->close();
                     <div class="card-body text-center">
                         <h5 class="card-title">Check Progress</h5>
                         <p class="card-text">View your saved responses and track your progress.</p>
-                        <a href="progress.php" class="btn btn-success">View Progress</a>
+                        <a href="user_progress.php" class="btn btn-success">View Progress</a>
                     </div>
                 </div>
             </div>
