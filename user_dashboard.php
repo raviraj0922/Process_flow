@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+// Check if user is logged in
+if (!isset($_SESSION['user_email'])) {
+    header("Location: index.php"); // Redirect to login page
+    exit();
+}
+
 // Database connection
 $servername = "localhost";
 $username = "";
@@ -12,32 +18,14 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Check if the user is logged in
-if (!isset($_SESSION['user_email'])) {
-    header("Location: index.php");
-    exit();
-}
-
-// Get user details
-$user_email = $_SESSION['user_email'];
-$user_query = $conn->prepare("SELECT id, first_name, last_name FROM users WHERE email = ?");
-$user_query->bind_param("s", $user_email);
-$user_query->execute();
-$user_query->bind_result($user_id, $first_name, $last_name);
-$user_query->fetch();
-$user_query->close();
-
-// Fetch submitted answers (Joining with questions table to get question text)
-$answers_query = $conn->prepare("
-    SELECT q.question_text, ua.answer, ua.submitted_at 
-    FROM user_answers ua
-    JOIN questions q ON ua.question_id = q.id
-    WHERE ua.user_email = ?
-");
-$answers_query->bind_param("s", $user_email);
-$answers_query->execute();
-$answers_result = $answers_query->get_result();
-
+// Fetch user details
+$user_email = $_SESSION['email'];
+$stmt = $conn->prepare("SELECT first_name, last_name FROM users WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$stmt->bind_result($first_name, $last_name);
+$stmt->fetch();
+$stmt->close();
 $conn->close();
 ?>
 
@@ -76,41 +64,51 @@ $conn->close();
       </nav>
 
       <!-- <section> begin -->
-      <section class="pt-5 mb-6" id="feature">
-        <div class="container mt-5">
-            <h2 class="text-center">Welcome, <?php echo htmlspecialchars($first_name . " " . $last_name); ?></h2>
-            <p class="text-center text-muted">Here are your submitted answers</p>
-
-            <table class="table table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Question</th>
-                        <th>Your Answer</th>
-                        <th>Submitted At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if ($answers_result->num_rows > 0): ?>
-                        <?php $count = 1; while ($row = $answers_result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo $count++; ?></td>
-                                <td><?php echo htmlspecialchars($row['question_text']); ?></td>
-                                <td><?php echo htmlspecialchars($row['answer']); ?></td>
-                                <td><?php echo $row['submitted_at']; ?></td>
-                            </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="4" class="text-center">No answers submitted yet.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-
-            <a href="logout.php" class="btn btn-danger">Logout</a>
+      <section class="vh-100 d-flex align-items-center justify-content-center" style="background-color: #0d6efd;">
+    <div class="container mt-5">
+        <h2 class="text-center text-white">Welcome to the Student Dashboard</h2>
+        <p class="text-center text-white">Logged in as: <strong><?php echo htmlspecialchars($first_name . " " . $last_name); ?></strong></p>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Start Your Form</h5>
+                        <p class="card-text">Proceed to fill out your multi-stage form.</p>
+                        <a href="user_form.php" class="btn btn-primary">Go to Form</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Check Progress</h5>
+                        <p class="card-text">View your saved responses and track your progress.</p>
+                        <a href="progress.php" class="btn btn-success">View Progress</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Submitted Response</h5>
+                        <p class="card-text">Here are your submitted answers.</p>
+                        <a href="response.php" class="btn btn-success">View Response</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Logout</h5>
+                        <p class="card-text">Logout from your account securely.</p>
+                        <a href="logout.php" class="btn btn-danger">Logout</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
+</section>
       <!-- <section> close -->
 
       <!-- <section> begin -->
