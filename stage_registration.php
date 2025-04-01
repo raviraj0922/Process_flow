@@ -9,9 +9,9 @@ $email = isset($_GET['email']) ? $_GET['email'] : $_SESSION['email'];
 
 // Database Connection
 $servername = "localhost";
-$username = "stage_app";
-$password = "Retail.app@123";
-$database = "app_database";
+$username = "";
+$password = "";
+$database = "";
 $conn = new mysqli($servername, $username, $password, $database);
 
 if ($conn->connect_error) {
