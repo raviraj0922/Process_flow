@@ -7,7 +7,7 @@ require 'PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$conn = new mysqli("localhost", "stage_app", "Retail.app@123", "app_database");
+$conn = new mysqli("localhost", "username", "password", "databse");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
