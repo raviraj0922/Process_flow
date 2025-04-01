@@ -7,7 +7,7 @@ require 'PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$conn = new mysqli("localhost", "username", "password", "databse");
+$conn = new mysqli("localhost", "stage_app", "Retail.app@123", "app_database");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -29,14 +29,14 @@ if (isset($_POST['action']) && $_POST['action'] == "send_otp") {
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
-        $mail->Host = 'mail.smtp.com'; // SMTP Server
+        $mail->Host = 'mail.retailcareer.org'; // SMTP Server
         $mail->SMTPAuth = true;
-        $mail->Username = 'youremail.org'; // Your email
-        $mail->Password = 'yourpass'; // Your email password
+        $mail->Username = 'contact@retailcareer.org'; // Your email
+        $mail->Password = 'Retail@2024'; // Your email password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('Your email', 'Support');
+        $mail->setFrom('contact@retailcareer.org', 'Retail Career');
         $mail->addAddress($email);
         $mail->Subject = 'Your OTP Code';
         $mail->Body = "Your OTP code is: " . $otp;
@@ -60,7 +60,7 @@ if (isset($_POST['action']) && $_POST['action'] == "verify_otp") {
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        // Mark OTP as verified
+        // ✅ Mark OTP as verified
         $stmt = $conn->prepare("UPDATE users_otp SET is_verified=1 WHERE email=?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -68,7 +68,8 @@ if (isset($_POST['action']) && $_POST['action'] == "verify_otp") {
         // ✅ Set session after successful OTP verification
         $_SESSION['email'] = $email; 
 
-        echo json_encode(["status" => "success", "message" => "OTP verified successfully"]);
+        // ✅ Send JSON response with redirect URL
+        echo json_encode(["status" => "success", "message" => "OTP verified successfully", "redirect" => "stage-registration.php?email=$email"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Invalid or expired OTP"]);
     }

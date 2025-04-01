@@ -102,10 +102,10 @@
     .catch(error => console.error("Error:", error));
 }
 
-function verifyOTP(event) {
-    event.preventDefault();
-    let email = document.getElementById("email").value;
-    let otp = document.getElementById("otp").value;
+document.getElementById("otp-form").addEventListener("submit", function (e) {
+    e.preventDefault(); // Form submit hone se roko
+    var email = document.getElementById("email").value;
+    var otp = document.getElementById("otp").value;
 
     fetch("otp_handler.php", {
         method: "POST",
@@ -114,13 +114,15 @@ function verifyOTP(event) {
     })
     .then(response => response.json())
     .then(data => {
-        alert(data.message);
         if (data.status === "success") {
-            window.location.replace("stages.php"); // Force redirection
+            alert(data.message);
+            window.location.href = data.redirect; // ✅ Redirect to stage-registration.php
+        } else {
+            alert(data.message);
         }
     })
     .catch(error => console.error("Error:", error));
-}
+});
       </script>
       <!-- <section> close -->
 
